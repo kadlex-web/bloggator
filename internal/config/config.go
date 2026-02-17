@@ -2,7 +2,9 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
+	"path/filepath"
 )
 
 /* Using encoding/decoding is important because it will read the JSON-encoded (or decoded data) as a stream and allow for buffering both in terms of reading and writing
@@ -14,24 +16,25 @@ const configFileName = ".gatorconfig.json"
 
 // struct object that holds the config data; use struct titles for efficient encoding/decoding
 type Config struct {
-	Dburl string `json:"db_url"`
+	Dburl    string `json:"db_url"`
 	Username string `json:"current_user_name"`
 }
 
 // returns file path of home directory
 func getConfigFilePath() (string, error) {
 	// for use on own system
-	_, err := os.UserHomeDir()
+	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
-	// for use in codespaces
-	github_path := "/workspaces/bloggator/" + configFileName
-	return github_path, nil
+	// for local use
+	path := filepath.Join(home, configFileName)
+	fmt.Println(path)
+	return path, nil
 }
 
 // updates a config struct with new values
-func write(cfg Config) error{
+func write(cfg Config) error {
 	// get the file path that needs to be written to and gracefully handle errors
 	dir, err := getConfigFilePath()
 	if err != nil {
@@ -77,8 +80,8 @@ func Read() (Config, error) {
 }
 
 func (cfg *Config) SetUser(user string) error {
-	updateCfg := Config {
-		Dburl: cfg.Dburl,
+	updateCfg := Config{
+		Dburl:    cfg.Dburl,
 		Username: user,
 	}
 	write(updateCfg)

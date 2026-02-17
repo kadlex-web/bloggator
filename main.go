@@ -12,7 +12,7 @@ type state struct {
 }
 
 type command struct {
-	name string
+	name      string
 	arguments []string
 }
 
@@ -33,6 +33,7 @@ func handlerLogin(s *state, cmd command) error {
 	fmt.Printf("User has been set to %v\n", username)
 	return nil
 }
+
 // method runs a given command with the provided state if it exists. method returns error value
 func (c *commands) run(s *state, cmd command) error {
 	// check the map to see if a command is registered
@@ -75,7 +76,7 @@ func main() {
 	}
 	// if it's good, create a command struct and send to the commands struct to run
 	userCmd := command{
-		name: input[1],
+		name:      input[1],
 		arguments: input[2:],
 	}
 	err = commandsMap.run(&s, userCmd)
