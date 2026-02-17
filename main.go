@@ -1,59 +1,22 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
 	"github.com/kadlex-web/bloggator/internal/config"
+	"github.com/kadlex-web/bloggator/internal/database"
+	_ "github.com/lib/pq" // side effects import
 )
 
 type state struct {
+	db *database.Queries
 	config *config.Config
 }
 
-type command struct {
-	name      string
-	arguments []string
-}
-
-type commands struct {
-	commands map[string]func(*state, command) error
-}
-
-func handlerLogin(s *state, cmd command) error {
-	// if the length of arguments is 0 -- no user can be logged in
-	if len(cmd.arguments) == 0 {
-		return fmt.Errorf("login expects a username")
-	}
-	username := cmd.arguments[0]
-	err := s.config.SetUser(username)
-	if err != nil {
-		return fmt.Errorf("error setting username")
-	}
-	fmt.Printf("User has been set to %v\n", username)
-	return nil
-}
-
-// method runs a given command with the provided state if it exists. method returns error value
-func (c *commands) run(s *state, cmd command) error {
-	// check the map to see if a command is registered
-	val, ok := c.commands[cmd.name]
-	if !ok {
-		return fmt.Errorf("command does not exist. please register command and try again")
-	}
-	err := val(s, cmd)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// method registers a new handler function for a command name. method has no return value
-func (c *commands) register(name string, f func(*state, command) error) {
-	c.commands[name] = f
-}
-
 func main() {
+
 	// create initial state
 	cfg, err := config.Read()
 	if err != nil {
@@ -61,12 +24,19 @@ func main() {
 		os.Exit(1)
 	}
 	s := state{config: &cfg}
+	// open a connection to the database using your dbURL which was stored in the state config
+	db, err := sql.Open("postgres", s.config.Dburl)
+	// save the database within the program state
+	s.db = database.New(db)
+
 	// create initial commands struct
 	commandsMap := commands{}
 	// initialize map of possible commands
 	commandsMap.commands = make(map[string]func(*state, command) error)
 	//register login command
-	commandsMap.register("login", handlerLogin)
+	commandsMap.registerCommand("login", handlerLogin)
+	// register the register command
+	commandsMap.registerCommand("register", handlerRegister)
 
 	// grab the user input and check if enough arguments have been passed for a command
 	input := os.Args

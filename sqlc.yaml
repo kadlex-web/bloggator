@@ -1,0 +1,8 @@
+version: "2"
+sql:
+  - schema: "sql/schema" # sqlc should look in this directory for our schema structure 
+    queries: "sql/queries" # sqlc should look in this directory for our queries
+    engine: "postgresql"
+    gen:
+      go:
+        out: "internal/database" # sqlc should generate Go code and place it in this directory
