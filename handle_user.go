@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,8 +18,7 @@ func handlerLogin(s *state, cmd command) error {
 	// check if user exists in db, if not, user is not logged in
 	_, err := s.db.GetUser(context.Background(), cmd.arguments[0])
 	if err != nil {
-		fmt.Println("user does not exist in the db. please register before trying again")
-		os.Exit(1)
+		return fmt.Errorf("user does not exist in the db. please register before trying again")
 	}
 	username := cmd.arguments[0]
 	err = s.config.SetUser(username)
@@ -30,6 +28,7 @@ func handlerLogin(s *state, cmd command) error {
 	fmt.Printf("User has been set to %v\n", username)
 	return nil
 }
+
 // registers users to the db; so they may login and use features
 func handlerRegister(s *state, cmd command) error {
 	if len(cmd.arguments) != 1 {
@@ -39,15 +38,14 @@ func handlerRegister(s *state, cmd command) error {
 	// if GetUser does not return an error, then the user already exists in the db and therefore cannot be created
 	_, err := s.db.GetUser(context.Background(), cmd.arguments[0])
 	if err == nil {
-		fmt.Println("user already exists. all users must be unique.")
-		os.Exit(1)
+		return fmt.Errorf("user already exists. all users must be unique.")
 	}
 	// if getUser returns an err -- it means the user is okay to be created!
 	newUser := database.CreateUserParams{
-		ID: u,
+		ID:        u,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Name: cmd.arguments[0],
+		Name:      cmd.arguments[0],
 	}
 	// create a new user in the table
 	data, err := s.db.CreateUser(context.Background(), newUser)

@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -29,7 +28,6 @@ func getConfigFilePath() (string, error) {
 	}
 	// for local use
 	path := filepath.Join(home, configFileName)
-	fmt.Println(path)
 	return path, nil
 }
 
