@@ -41,6 +41,8 @@ func main() {
 	commandsMap.registerCommand("reset", handlerReset)
 	// register the users command
 	commandsMap.registerCommand("users", handlerGetUsers)
+	// register the aggregate command
+	commandsMap.registerCommand("agg", aggregate)
 	// grab the user input and check if enough arguments have been passed for a command
 	input := os.Args
 	if len(input) < 2 {
