@@ -37,23 +37,22 @@ func fetchFeed(ctx context.Context, feedURL string) (*r.RSSFeed, error) {
 	if err != nil {
 		return &r.RSSFeed{}, fmt.Errorf("error unmarshaling xml data into feed.")
 	}
+	feed = *cleanXML(&feed)
 	return &feed, nil
 }
 
-func cleanXML(data *r.RSSFeed) {
-	fmt.Println(html.UnescapeString(data.Channel.Title))
-	fmt.Println(html.UnescapeString(data.Channel.Description))
-	fmt.Println(html.UnescapeString(data.Channel.Link))
-	for _, rssItem := range data.Channel.Item {
-		fmt.Println(html.UnescapeString(rssItem.Title))
-		fmt.Println(html.UnescapeString(rssItem.Description))
-		fmt.Println(html.UnescapeString(rssItem.Link))
-		fmt.Println(html.UnescapeString(rssItem.PubDate))
-		fmt.Println()
+func cleanXML(data *r.RSSFeed) *r.RSSFeed {
+	data.Channel.Title = html.UnescapeString(data.Channel.Title)
+	data.Channel.Description = html.UnescapeString(data.Channel.Description)
+	for i, rssItem := range data.Channel.Item {
+		rssItem.Title = html.UnescapeString(rssItem.Title)
+		rssItem.Description = html.UnescapeString(rssItem.Description)
+		data.Channel.Item[i] = rssItem
 	}
+	return data
 }
 
-func aggregate(s *state, cmd command) error {
+func handlerAggregate(s *state, cmd command) error {
 	// right now aggregate will only access ONE feed -- but eventually will do more
 	if len(cmd.arguments) != 0 {
 		return fmt.Errorf("aggregate command doesn't contain arguments")
@@ -63,6 +62,6 @@ func aggregate(s *state, cmd command) error {
 	if err != nil {
 		return err
 	}
-	cleanXML(data)
+	fmt.Println(data)
 	return nil
 }

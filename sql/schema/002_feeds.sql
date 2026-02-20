@@ -5,7 +5,8 @@ CREATE TABLE feeds (
   updated_at TIMESTAMP NOT NULL,
   name TEXT NOT NULL,
   url TEXT NOT NULL UNIQUE,
-  user_id FOREIGN KEY ON DELETE CASCADE,
+  user_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL
   );
+
 -- +goose Down
 DROP TABLE feeds;

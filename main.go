@@ -33,16 +33,15 @@ func main() {
 	commandsMap := commands{}
 	// initialize map of possible commands
 	commandsMap.commands = make(map[string]func(*state, command) error)
-	//register login command
+
+	//Commands block
 	commandsMap.registerCommand("login", handlerLogin)
-	// register the register command
 	commandsMap.registerCommand("register", handlerRegister)
-	//register the reset command
 	commandsMap.registerCommand("reset", handlerReset)
-	// register the users command
 	commandsMap.registerCommand("users", handlerGetUsers)
-	// register the aggregate command
-	commandsMap.registerCommand("agg", aggregate)
+	commandsMap.registerCommand("agg", handlerAggregate)
+	commandsMap.registerCommand("addfeed", handlerAddFeed)
+
 	// grab the user input and check if enough arguments have been passed for a command
 	input := os.Args
 	if len(input) < 2 {
