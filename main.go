@@ -42,6 +42,9 @@ func main() {
 	commandsMap.registerCommand("agg", handlerAggregate)
 	commandsMap.registerCommand("addfeed", handlerAddFeed)
 	commandsMap.registerCommand("feeds", handlerGetFeeds)
+	commandsMap.registerCommand("follow", handlerFollow)
+	commandsMap.registerCommand("following", handlerFollowing)
+
 	// grab the user input and check if enough arguments have been passed for a command
 	input := os.Args
 	if len(input) < 2 {
