@@ -34,16 +34,19 @@ func main() {
 	// initialize map of possible commands
 	commandsMap.commands = make(map[string]func(*state, command) error)
 
-	//Commands block
+	//commands which do not use middleware
 	commandsMap.registerCommand("login", handlerLogin)
 	commandsMap.registerCommand("register", handlerRegister)
 	commandsMap.registerCommand("reset", handlerReset)
 	commandsMap.registerCommand("users", handlerGetUsers)
 	commandsMap.registerCommand("agg", handlerAggregate)
-	commandsMap.registerCommand("addfeed", handlerAddFeed)
 	commandsMap.registerCommand("feeds", handlerGetFeeds)
-	commandsMap.registerCommand("follow", handlerFollow)
-	commandsMap.registerCommand("following", handlerFollowing)
+
+	// commands which use middleware
+	commandsMap.registerCommand("addfeed", middlewareLoggedIn(handlerAddFeed))
+	commandsMap.registerCommand("follow", middlewareLoggedIn(handlerFollow))
+	commandsMap.registerCommand("following", middlewareLoggedIn(handlerFollowing))
+	commandsMap.registerCommand("unfollow", middlewareLoggedIn(handlerUnfollowFeed))
 
 	// grab the user input and check if enough arguments have been passed for a command
 	input := os.Args

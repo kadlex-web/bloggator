@@ -3,17 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/kadlex-web/bloggator/internal/database"
 )
 
-func handlerFollowing(s *state, cmd command) error {
+func handlerFollowing(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 0 {
 		return fmt.Errorf("following command takes no arguments")
 	}
-	currentUser, err := s.db.GetUser(context.Background(), s.config.Username)
-	if err != nil {
-		return fmt.Errorf("error fetching current user from config")
-	}
-	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), currentUser.ID)
+	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		return fmt.Errorf("error fetching follows from the database")
 	}
@@ -21,7 +19,7 @@ func handlerFollowing(s *state, cmd command) error {
 		fmt.Println("You haven't followed any feeds yet. Please use 'follow <url> to follow a feed")
 		return nil
 	}
-	fmt.Printf("User: %s is following these feeds:\n", currentUser.Name)
+	fmt.Printf("User: %s is following these feeds:\n", user.Name)
 	for _, feed := range feedFollows {
 		fmt.Printf("- %s\n", feed.FeedName)
 	}

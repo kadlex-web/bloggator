@@ -10,7 +10,7 @@ import (
 )
 
 // HandlerFollow implements the follow command
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, user database.User) error {
 	// if the user passed more then one argument to the function -- print the error below
 	if len(cmd.arguments) != 1 {
 		return fmt.Errorf("follow command only requires url. ex: follow https://hnrss.org/newest")
@@ -21,16 +21,12 @@ func handlerFollow(s *state, cmd command) error {
 	if err != nil {
 		return fmt.Errorf("error fetching feed id from database")
 	}
-	currentUser, err := s.db.GetUser(context.Background(), s.config.Username)
-	if err != nil {
-		return fmt.Errorf("error fetching user id from database")
-	}
 	u := uuid.New()
 	feedParams := database.CreateFeedFollowParams{
 		ID:        u,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		ID_2:      currentUser.ID,
+		ID_2:      user.ID,
 		ID_3:      feedID,
 	}
 	feedFollow, err := s.db.CreateFeedFollow(context.Background(), feedParams)

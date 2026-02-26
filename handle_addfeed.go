@@ -9,15 +9,11 @@ import (
 	"github.com/kadlex-web/bloggator/internal/database"
 )
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 2 {
 		return fmt.Errorf("addfeed command takes two arguments. ex: addfeed google www.google.com")
 	}
-	// get the currently logged-in user from the database
-	currentUser, err := s.db.GetUser(context.Background(), s.config.Username)
-	if err != nil {
-		return fmt.Errorf("cannot get currently logged in user")
-	}
+
 	feedName := cmd.arguments[0]
 	feedUrl := cmd.arguments[1]
 	u := uuid.New()
@@ -27,7 +23,7 @@ func handlerAddFeed(s *state, cmd command) error {
 		UpdatedAt: time.Now(),
 		Name:      feedName,
 		Url:       feedUrl,
-		UserID:    currentUser.ID,
+		UserID:    user.ID,
 	}
 
 	feed, err := s.db.CreateFeed(context.Background(), feedParams)
@@ -45,7 +41,7 @@ func handlerAddFeed(s *state, cmd command) error {
 		ID:        u,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		ID_2:      currentUser.ID,
+		ID_2:      user.ID,
 		ID_3:      u,
 	}
 	feedFollow, err := s.db.CreateFeedFollow(context.Background(), followParams)
